@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lightsaber Collection API - Documentation</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>⚔️ Lightsaber Collection API</h1>
+            <p class="subtitle">Educational REST API for Swift/iOS Development</p>
+            <div class="api-info">
+                <span class="base-url">Base URL: <code>/api</code></span>
+            </div>
+        </header>
+
+        <nav class="nav">
+            <button class="nav-btn active" data-section="overview">Overview</button>
+            <button class="nav-btn" data-section="endpoints">Endpoints</button>
+            <button class="nav-btn" data-section="swift">Swift Examples</button>
+            <button class="nav-btn" data-section="playground">API Playground</button>
+        </nav>
+
+        <main class="main">
+            <!-- Overview Section -->
+            <section id="overview" class="section active">
+                <h2>📚 Overview</h2>
+                <p>This API provides a complete CRUD interface for managing a lightsaber collection. Perfect for learning HTTP methods in iOS development!</p>
+                
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>🔍 GET Requests</h3>
+                        <p>Retrieve lightsabers with optional filtering by color, creator, or active status</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>➕ POST Requests</h3>
+                        <p>Create new lightsabers with validation for all required fields</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔄 PUT/PATCH</h3>
+                        <p>Update existing lightsabers - full replacement (PUT) or partial updates (PATCH)</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🗑️ DELETE</h3>
+                        <p>Remove lightsabers from the collection</p>
+                    </div>
+                </div>
+
+                <div class="data-model">
+                    <h3>🏗️ Lightsaber Data Model</h3>
+                    <pre><code>{
+  "id": "uuid-string",
+  "name": "Luke's Lightsaber",
+  "color": "blue",
+  "creator": "Anakin Skywalker",
+  "crystalType": "Kyber",
+  "hiltMaterial": "Durasteel",
+  "createdAt": "2025-07-24T10:00:00Z",
+  "isActive": true
+}</code></pre>
+                </div>
+
+                <div class="valid-values">
+                    <h3>✅ Valid Values</h3>
+                    <div class="value-group">
+                        <h4>Colors:</h4>
+                        <div class="tags">
+                            <span class="tag">blue</span>
+                            <span class="tag">green</span>
+                            <span class="tag">red</span>
+                            <span class="tag">purple</span>
+                            <span class="tag">yellow</span>
+                            <span class="tag">orange</span>
+                            <span class="tag">white</span>
+                            <span class="tag">black</span>
+                            <span class="tag">silver</span>
+                        </div>
+                    </div>
+                    <div class="value-group">
+                        <h4>Crystal Types:</h4>
+                        <div class="tags">
+                            <span class="tag">Kyber</span>
+                            <span class="tag">Synthetic</span>
+                            <span class="tag">Adegan</span>
+                            <span class="tag">Ilum</span>
+                            <span class="tag">Hurrikaine</span>
+                            <span class="tag">Krayt Dragon Pearl</span>
+                            <span class="tag">Solari</span>
+                            <span class="tag">Mantle of the Force</span>
+                        </div>
+                    </div>
+                    <div class="value-group">
+                        <h4>Hilt Materials:</h4>
+                        <div class="tags">
+                            <span class="tag">Durasteel</span>
+                            <span class="tag">Phrik</span>
+                            <span class="tag">Cortosis</span>
+                            <span class="tag">Beskar</span>
+                            <span class="tag">Electrum</span>
+                            <span class="tag">Chromium</span>
+                            <span class="tag">Bronzium</span>
+                            <span class="tag">Aurodium</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Endpoints Section -->
+            <section id="endpoints" class="section">
+                <h2>🔌 API Endpoints</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="path">/api/lightsabers</span>
+                    </div>
+                    <p>Get all lightsabers with optional filtering</p>
+                    <div class="params">
+                        <h4>Query Parameters (optional):</h4>
+                        <ul>
+                            <li><code>color</code> - Filter by lightsaber color</li>
+                            <li><code>creator</code> - Filter by creator name</li>
+                            <li><code>active</code> - Filter by active status (true/false)</li>
+                        </ul>
+                    </div>
+                    <div class="example">
+                        <h4>Example:</h4>
+                        <code>GET /api/lightsabers?color=blue&active=true</code>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="path">/api/lightsabers/:id</span>
+                    </div>
+                    <p>Get a specific lightsaber by ID</p>
+                    <div class="example">
+                        <h4>Example:</h4>
+                        <code>GET /api/lightsabers/123e4567-e89b-12d3-a456-426614174000</code>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="path">/api/lightsabers</span>
+                    </div>
+                    <p>Create a new lightsaber</p>
+                    <div class="request-body">
+                        <h4>Request Body:</h4>
+                        <pre><code>{
+  "name": "Mace Windu's Lightsaber",
+  "color": "purple",
+  "creator": "Mace Windu",
+  "crystalType": "Kyber",
+  "hiltMaterial": "Electrum",
+  "isActive": true
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method put">PUT</span>
+                        <span class="path">/api/lightsabers/:id</span>
+                    </div>
+                    <p>Replace an entire lightsaber (all fields required)</p>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method patch">PATCH</span>
+                        <span class="path">/api/lightsabers/:id</span>
+                    </div>
+                    <p>Partially update a lightsaber (only provided fields updated)</p>
+                    <div class="request-body">
+                        <h4>Example Request Body:</h4>
+                        <pre><code>{
+  "color": "red",
+  "isActive": false
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method delete">DELETE</span>
+                        <span class="path">/api/lightsabers/:id</span>
+                    </div>
+                    <p>Delete a lightsaber from the collection</p>
+                    <div class="response">
+                        <h4>Response:</h4>
+                        <code>204 No Content</code>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Swift Examples Section -->
+            <section id="swift" class="section">
+                <h2>🍎 Swift/iOS Examples</h2>
+                
+                <div class="swift-example">
+                    <h3>📱 Basic URLSession Setup</h3>
+                    <pre><code class="swift">import Foundation
+
+class LightsaberAPI {
+    private let baseURL = "http://localhost:3000/api"
+    private let session = URLSession.shared
+    
+    // Helper method for JSON encoding
+    private func encodeJSON<T: Codable>(_ object: T) throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return try encoder.encode(object)
+    }
+    
+    // Helper method for JSON decoding
+    private func decodeJSON<T: Codable>(_ type: T.Type, from data: Data) throws -> T {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode(type, from: data)
+    }
+}</code></pre>
+                </div>
+
+                <div class="swift-example">
+                    <h3>🔍 GET All Lightsabers</h3>
+                    <pre><code class="swift">func getAllLightsabers(color: String? = nil, creator: String? = nil) async throws -> [Lightsaber] {
+    var urlComponents = URLComponents(string: "\(baseURL)/lightsabers")!
+    var queryItems: [URLQueryItem] = []
+    
+    if let color = color {
+        queryItems.append(URLQueryItem(name: "color", value: color))
+    }
+    if let creator = creator {
+        queryItems.append(URLQueryItem(name: "creator", value: creator))
+    }
+    
+    if !queryItems.isEmpty {
+        urlComponents.queryItems = queryItems
+    }
+    
+    let (data, response) = try await session.data(from: urlComponents.url!)
+    
+    guard let httpResponse = response as? HTTPURLResponse else {
+        throw LightsaberError.invalidResponse
+    }
+    
+    guard httpResponse.statusCode == 200 else {
+        throw LightsaberError.serverError(httpResponse.statusCode)
+    }
+    
+    let apiResponse = try decodeJSON(APIResponse<[Lightsaber]>.self, from: data)
+    return apiResponse.data ?? []
+}</code></pre>
+                </div>
+
+                <div class="swift-example">
+                    <h3>➕ POST Create Lightsaber</h3>
+                    <pre><code class="swift">func createLightsaber(_ lightsaber: CreateLightsaberRequest) async throws -> Lightsaber {
+    guard let url = URL(string: "\(baseURL)/lightsabers") else {
+        throw LightsaberError.invalidURL
+    }
+    
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.httpBody = try encodeJSON(lightsaber)
+    
+    let (data, response) = try await session.data(for: request)
+    
+    guard let httpResponse = response as? HTTPURLResponse else {
+        throw LightsaberError.invalidResponse
+    }
+    
+    guard httpResponse.statusCode == 201 else {
+        throw LightsaberError.serverError(httpResponse.statusCode)
+    }
+    
+    let apiResponse = try decodeJSON(APIResponse<Lightsaber>.self, from: data)
+    guard let createdLightsaber = apiResponse.data else {
+        throw LightsaberError.noData
+    }
+    
+    return createdLightsaber
+}</code></pre>
+                </div>
+
+                <div class="swift-example">
+                    <h3>🔄 PATCH Update Lightsaber</h3>
+                    <pre><code class="swift">func updateLightsaber(id: String, updates: UpdateLightsaberRequest) async throws -> Lightsaber {
+    guard let url = URL(string: "\(baseURL)/lightsabers/\(id)") else {
+        throw LightsaberError.invalidURL
+    }
+    
+    var request = URLRequest(url: url)
+    request.httpMethod = "PATCH"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.httpBody = try encodeJSON(updates)
+    
+    let (data, response) = try await session.data(for: request)
+    
+    guard let httpResponse = response as? HTTPURLResponse else {
+        throw LightsaberError.invalidResponse
+    }
+    
+    guard httpResponse.statusCode == 200 else {
+        throw LightsaberError.serverError(httpResponse.statusCode)
+    }
+    
+    let apiResponse = try decodeJSON(APIResponse<Lightsaber>.self, from: data)
+    guard let updatedLightsaber = apiResponse.data else {
+        throw LightsaberError.noData
+    }
+    
+    return updatedLightsaber
+}</code></pre>
+                </div>
+
+                <div class="swift-example">
+                    <h3>📋 Data Models</h3>
+                    <pre><code class="swift">struct Lightsaber: Codable, Identifiable {
+    let id: String
+    let name: String
+    let color: String
+    let creator: String
+    let crystalType: String
+    let hiltMaterial: String
+    let createdAt: Date
+    let isActive: Bool
+}
+
+struct CreateLightsaberRequest: Codable {
+    let name: String
+    let color: String
+    let creator: String
+    let crystalType: String
+    let hiltMaterial: String
+    let isActive: Bool?
+}
+
+struct UpdateLightsaberRequest: Codable {
+    let name: String?
+    let color: String?
+    let creator: String?
+    let crystalType: String?
+    let hiltMaterial: String?
+    let isActive: Bool?
+}
+
+struct APIResponse<T: Codable>: Codable {
+    let success: Bool
+    let data: T?
+    let message: String?
+    let error: String?
+}
+
+enum LightsaberError: Error {
+    case invalidURL
+    case invalidResponse
+    case serverError(Int)
+    case noData
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- API Playground Section -->
+            <section id="playground" class="section">
+                <h2>🎮 API Playground</h2>
+                <p>Test the API endpoints directly from this page!</p>
+
+                <div class="playground">
+                    <div class="test-section">
+                        <h3>🔍 GET All Lightsabers</h3>
+                        <div class="form-group">
+                            <label for="filter-color">Filter by Color:</label>
+                            <select id="filter-color">
+                                <option value="">All Colors</option>
+                                <option value="blue">Blue</option>
+                                <option value="green">Green</option>
+                                <option value="red">Red</option>
+                                <option value="purple">Purple</option>
+                                <option value="yellow">Yellow</option>
+                                <option value="orange">Orange</option>
+                                <option value="white">White</option>
+                                <option value="black">Black</option>
+                                <option value="silver">Silver</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-creator">Filter by Creator:</label>
+                            <input type="text" id="filter-creator" placeholder="e.g., Anakin Skywalker">
+                        </div>
+                        <button id="get-all-btn" class="btn btn-primary">Get All Lightsabers</button>
+                    </div>
+
+                    <div class="test-section">
+                        <h3>➕ Create New Lightsaber</h3>
+                        <form id="create-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="create-name">Name:</label>
+                                    <input type="text" id="create-name" required placeholder="e.g., Yoda's Lightsaber">
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-color">Color:</label>
+                                    <select id="create-color" required>
+                                        <option value="">Select Color</option>
+                                        <option value="blue">Blue</option>
+                                        <option value="green">Green</option>
+                                        <option value="red">Red</option>
+                                        <option value="purple">Purple</option>
+                                        <option value="yellow">Yellow</option>
+                                        <option value="orange">Orange</option>
+                                        <option value="white">White</option>
+                                        <option value="black">Black</option>
+                                        <option value="silver">Silver</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="create-creator">Creator:</label>
+                                    <input type="text" id="create-creator" required placeholder="e.g., Yoda">
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-crystal">Crystal Type:</label>
+                                    <select id="create-crystal" required>
+                                        <option value="">Select Crystal</option>
+                                        <option value="Kyber">Kyber</option>
+                                        <option value="Synthetic">Synthetic</option>
+                                        <option value="Adegan">Adegan</option>
+                                        <option value="Ilum">Ilum</option>
+                                        <option value="Hurrikaine">Hurrikaine</option>
+                                        <option value="Krayt Dragon Pearl">Krayt Dragon Pearl</option>
+                                        <option value="Solari">Solari</option>
+                                        <option value="Mantle of the Force">Mantle of the Force</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="create-material">Hilt Material:</label>
+                                    <select id="create-material" required>
+                                        <option value="">Select Material</option>
+                                        <option value="Durasteel">Durasteel</option>
+                                        <option value="Phrik">Phrik</option>
+                                        <option value="Cortosis">Cortosis</option>
+                                        <option value="Beskar">Beskar</option>
+                                        <option value="Electrum">Electrum</option>
+                                        <option value="Chromium">Chromium</option>
+                                        <option value="Bronzium">Bronzium</option>
+                                        <option value="Aurodium">Aurodium</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="create-active">Active:</label>
+                                    <select id="create-active">
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">Create Lightsaber</button>
+                        </form>
+                    </div>
+
+                    <div id="response-section" class="response-section">
+                        <h3>📋 API Response</h3>
+                        <div id="response-container">
+                            <p class="no-response">Make a request to see the response here...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
