@@ -52,8 +52,8 @@ struct LightsaberListView: View {
                 Text(service.errorMessage ?? "")
             }
         }
-        .task {
-            await service.fetchLightsabers()
+        .onAppear {
+            service.fetchLightsabers()
         }
         .environmentObject(service)
     }
@@ -61,8 +61,8 @@ struct LightsaberListView: View {
     private func deleteLightsabers(offsets: IndexSet) {
         for index in offsets {
             let lightsaber = service.lightsabers[index]
-            Task {
-                await service.deleteLightsaber(id: lightsaber.id)
+            service.deleteLightsaber(id: lightsaber.id) { success in
+                print("Success")
             }
         }
     }

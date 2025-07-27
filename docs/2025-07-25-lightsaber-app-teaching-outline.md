@@ -170,13 +170,14 @@ let lightsaber = try JSONDecoder().decode(Lightsaber.self, from: jsonData)
 - URL structure: `http://localhost:3000/api/lightsabers`
 - Headers and response handling
 - URLSession basics
+- Traditional dataTask approach vs async-await (start with dataTask)
 
 #### Practice (15 minutes)
 
-Students implement `fetchLightsabers()` in `LightsaberService.swift`:
+Students implement `fetchLightsabers()` in `LightsaberService.swift` using traditional dataTask:
 
 ```swift
-func fetchLightsabers() async {
+func fetchLightsabers() {
     isFetchingLightsabers = true
     errorMessage = nil
 
@@ -185,18 +186,44 @@ func fetchLightsabers() async {
         isFetchingLightsabers = false
         return
     }
-
-    do {
-        let (data, _) = try await URLSession.shared.data(from: url)
-        let response = try JSONDecoder().decode(APIResponse<[Lightsaber]>.self, from: data)
-        lightsabers = response.data
-    } catch {
-        errorMessage = error.localizedDescription
+    
+    let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+        DispatchQueue.main.async {
+            guard let self = self else { return }
+            
+            if let error = error {
+                self.errorMessage = error.localizedDescription
+                self.isFetchingLightsabers = false
+                return
+            }
+            
+            guard let data = data else {
+                self.errorMessage = "No data received"
+                self.isFetchingLightsabers = false
+                return
+            }
+            
+            do {
+                let response = try JSONDecoder().decode(APIResponse<[Lightsaber]>.self, from: data)
+                self.lightsabers = response.data
+            } catch {
+                self.errorMessage = error.localizedDescription
+            }
+            
+            self.isFetchingLightsabers = false
+        }
     }
-
-    isFetchingLightsabers = false
+    
+    task.resume()
 }
 ```
+
+**Teaching Points:**
+- URLSession.shared.dataTask is the traditional networking approach
+- Completion handler pattern with (data, response, error) parameters
+- DispatchQueue.main.async for UI updates
+- [weak self] to avoid retain cycles
+- task.resume() to start the request
 
 ### 3.2 Implementing POST Request (20 minutes)
 
@@ -205,20 +232,23 @@ func fetchLightsabers() async {
 - Request body and headers
 - Content-Type: application/json
 - Status codes (201 Created)
+- URLRequest configuration for POST requests
+- Completion handlers pattern
 
 #### Practice (15 minutes)
 
-Students implement `createLightsaber()`:
+Students implement `createLightsaber()` using traditional dataTask with completion handlers:
 
 ```swift
-func createLightsaber(_ lightsaber: Lightsaber) async -> Bool {
+func createLightsaber(_ lightsaber: Lightsaber, completion: @escaping (Bool) -> Void) {
     isCreatingLightsaber = true
     errorMessage = nil
 
     guard let url = URL(string: "\(baseURL)/lightsabers") else {
         errorMessage = "Invalid URL"
         isCreatingLightsaber = false
-        return false
+        completion(false)
+        return
     }
 
     var request = URLRequest(url: url)
@@ -228,34 +258,70 @@ func createLightsaber(_ lightsaber: Lightsaber) async -> Bool {
     do {
         let jsonData = try JSONEncoder().encode(lightsaber)
         request.httpBody = jsonData
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        if let httpResponse = response as? HTTPURLResponse,
-           httpResponse.statusCode == 201 {
-            let newLightsaber = try JSONDecoder().decode(Lightsaber.self, from: data)
-            lightsabers.append(newLightsaber)
-            isCreatingLightsaber = false
-            return true
-        } else {
-            errorMessage = "Failed to create lightsaber"
-            isCreatingLightsaber = false
-            return false
-        }
     } catch {
         errorMessage = error.localizedDescription
         isCreatingLightsaber = false
-        return false
+        completion(false)
+        return
     }
+
+    let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+        DispatchQueue.main.async {
+            guard let self = self else { return }
+            
+            if let error = error {
+                self.errorMessage = error.localizedDescription
+                self.isCreatingLightsaber = false
+                completion(false)
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                self.errorMessage = "Invalid response"
+                self.isCreatingLightsaber = false
+                completion(false)
+                return
+            }
+            
+            if httpResponse.statusCode == 201,
+               let data = data {
+                do {
+                    let newLightsaber = try JSONDecoder().decode(Lightsaber.self, from: data)
+                    self.lightsabers.append(newLightsaber)
+                    self.isCreatingLightsaber = false
+                    completion(true)
+                } catch {
+                    self.errorMessage = error.localizedDescription
+                    self.isCreatingLightsaber = false
+                    completion(false)
+                }
+            } else {
+                self.errorMessage = "Failed to create lightsaber"
+                self.isCreatingLightsaber = false
+                completion(false)
+            }
+        }
+    }
+    
+    task.resume()
 }
 ```
 
+**Teaching Points:**
+- Traditional URLRequest for POST with custom headers and body
+- JSON encoding happens before the network call
+- Completion handlers teach callback patterns
+- HTTP status code checking (201 Created)
+- Error handling at multiple levels
+
 ### 3.3 Implementing PATCH & DELETE (10 minutes)
 
-Students complete one of the remaining methods following similar patterns:
+Students complete one of the remaining methods following similar dataTask + completion handler patterns:
 
-- `updateLightsaber()` - PATCH request OR
-- `deleteLightsaber()` - DELETE request
+- `updateLightsaber(_ lightsaber: Lightsaber, completion: @escaping (Bool) -> Void)` - PATCH request OR
+- `deleteLightsaber(id: String, completion: @escaping (Bool) -> Void)` - DELETE request
+
+Both follow the same pattern: URLRequest setup → dataTask with completion handler → task.resume()
 
 **Key Takeaway:** HTTP methods are just different ways to communicate what action you want to perform on the server.
 
@@ -382,10 +448,26 @@ Students enhance the app by:
 
 ### Additional Learning
 
-- Swift Async/Await deep dive
+- **Swift Async/Await deep dive** - Converting Task-based code to pure async-await
 - Combine framework for reactive programming
 - Network layer architecture patterns
 - Unit testing network code
+
+### Traditional Networking vs Async/Await Progression
+
+This workshop uses a progressive learning approach:
+
+1. **Start with URLSession.shared.dataTask** - Traditional networking with completion handlers
+2. **Learn callback patterns** - Understanding (data, response, error) parameters
+3. **Use DispatchQueue.main.async** - Understand UI thread management
+4. **Handle [weak self]** - Learn memory management
+5. **Later: async/await** - Show the cleaner, more modern approach
+
+This progression helps students understand:
+- The traditional networking foundation
+- Why completion handlers were necessary
+- How async/await simplifies the same concepts
+- The evolution of Swift's networking capabilities
 
 ### Tools & Documentation
 

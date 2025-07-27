@@ -92,8 +92,8 @@ struct AddLightsaberView: View {
             isActive: isActive
         )
         
-        Task {
-            let success = await service.createLightsaber(newLightsaber)
+        
+        service.createLightsaber(newLightsaber) { success in
             if success {
                 dismiss()
             } else {
@@ -101,6 +101,7 @@ struct AddLightsaberView: View {
                 showingAlert = true
             }
         }
+        
     }
     
     private func colorForLightsaber(_ color: String) -> Color {

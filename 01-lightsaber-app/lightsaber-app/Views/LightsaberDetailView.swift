@@ -76,19 +76,17 @@ struct LightsaberDetailView: View {
             isActive: !lightsaber.isActive
         )
         
-        Task {
-            let success = await service.updateLightsaber(updatedLightsaber)
-            
-            isToggling = false
-            
+        
+        service.updateLightsaber(updatedLightsaber) { success in
             if !success {
                 // Handle error - revert animation
                 withAnimation(.easeInOut(duration: 0.3)) {
                     animatedIsActive = lightsaber.isActive
                 }
-                print("Failed to toggle lightsaber status")
             }
         }
+        
+        isToggling = false
     }
 }
 
