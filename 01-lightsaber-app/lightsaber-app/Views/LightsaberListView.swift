@@ -27,7 +27,7 @@ struct LightsaberListView: View {
                         .onDelete(perform: deleteLightsabers)
                     }
                     .refreshable {
-                        await service.fetchLightsabers()
+                        service.fetchLightsabers()
                     }
                 }
             }
